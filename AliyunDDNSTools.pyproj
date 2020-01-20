@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>2d51080d-8f1a-43b5-91ee-cee329442520</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>AliyunDDNSTools.py</StartupFile>
+    <StartupFile>test.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,17 +21,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AddDomainRecord.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="AliyunDDNSTools.py" />
     <Compile Include="commonModule.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DeleteDomainRecord.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DeleteSubDomainRecords.py">
+    <Compile Include="test.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
