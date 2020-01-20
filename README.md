@@ -8,9 +8,11 @@ AliyunDDNSTools
 4、Aliyun Python SDK for Domain https://pypi.org/project/aliyun-python-sdk-domain-intl/<br>
 ## 运行方式<br>
 首先手动创建userconfigure.json，格式如下：<br>
-{<br>
->>>"accessKeyId": "Your accessKeyId",<br>
->>>"accessSecret": "Your accessSecret",<br>
->>>"domainName": "Your domainName"<br>
-}<br>
+```json
+{
+  "accessKeyId": "Your accessKeyId",
+  "accessSecret": "Your accessSecret",
+  "domainName": "Your domainName"
+}
+```
 然后修改源代码中userConfigPath变量的值为userconfigure.json的路径
