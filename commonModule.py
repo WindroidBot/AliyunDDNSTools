@@ -13,13 +13,16 @@ import os
 import sys
 import urllib.request
 
-#从指定的配置文件读取用户配置
-def ReadUserConfig(configPath):
-    with open(configPath,'r') as jsonFile:
+#从指定的配置文件读取配置
+def ReadConfig(configPath):
+    with open(configPath,'r', encoding='utf-8') as jsonFile:
         config = json.load(jsonFile)
     return config
 
-#从已生成的client执行request并返回结果
+'''
+从已生成的client执行request并返回结果，注意：返回的结果是str类型，需要使用json.loads(...)转为json，才可以访问
+或者不使用responseDict=json.dumps(responseJson,indent=4)，直接返回responseJson
+'''
 def ExecuteGetResults(client,request):
     response = client.do_action_with_exception(request)
     responseStr = str(response, encoding = "utf8")
@@ -29,7 +32,7 @@ def ExecuteGetResults(client,request):
 
 #从指定的配置文件构造client对象
 def GetAliyunClient(configPath):
-    UserConfig = ReadUserConfig(configPath)
+    UserConfig = ReadConfig(configPath)
     accessKeyId = UserConfig['accessKeyId']
     accessSecret = UserConfig['accessSecret']
     domainName = UserConfig['domainName']
@@ -43,6 +46,26 @@ def GetPublicIpAddress():
     responseIpAddress = str(response, encoding = "utf8")
     return responseIpAddress
 
+'''
+获取所有云端记录的IP地址
+格式为[{'Remote_RR': ..., 'Remote_Value': ...}, {'Remote_RR': ..., 'Remote_Value': ...}]
+'''
+def GetRemoteRecordsIpAddress():
+    userConfigPath = "C:/Users/windr/Documents/userInfo.json"
+    UserConfig = ReadConfig(userConfigPath)
+    domainName = UserConfig['domainName']
+    client = GetAliyunClient(userConfigPath)
+    DescribeDomainRecords = DescribeDomainRecordsRequestHelper(client, domainName)
+    DescribeDomainRecordsJson = json.loads(DescribeDomainRecords)
+    RemoteList_RRValue = []
+    for i in range(len(DescribeDomainRecordsJson['DomainRecords']['Record'])):
+        Remote_RR = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['RR']
+        Remote_Value = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['Value']
+        RemoteDict_RRValue = {'Remote_RR':Remote_RR, 'Remote_Value':Remote_Value}
+        RemoteList_RRValue.append(RemoteDict_RRValue)
+    #print(RemoteList_RRValue)
+    return RemoteList_RRValue
+
 #获取指定域名的所有子域名信息
 #https://help.aliyun.com/document_detail/29776.html?spm=a2c4g.11186623.6.650.94a13b59Q6kBCd
 def DescribeDomainRecordsRequestHelper(Client, DomainName):
@@ -52,7 +75,7 @@ def DescribeDomainRecordsRequestHelper(Client, DomainName):
     Request.set_DomainName(DomainName)
 
     result = ExecuteGetResults(Client,Request)
-    print(result)
+    #print(result)
     return result
 
 #增加主机记录
@@ -99,7 +122,7 @@ def DeleteSubDomainRecordsHelper(Client, DomainName, RR):
     print(result)
     return result
 
-#根据修改RecordId对应的记录的信息
+#根据RecordId修改对应的记录的信息
 #https://help.aliyun.com/document_detail/29774.html?spm=a2c4g.11186623.6.655.43fd3192UJmbmD
 def UpdateDomainRecordHelper(Client, RecordId, RR, Type, Value, Line):
     Request = UpdateDomainRecordRequest()

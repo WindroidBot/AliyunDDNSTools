@@ -11,6 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>AliyunDDNSTools</Name>
     <RootNamespace>AliyunDDNSTools</RootNamespace>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="commonModule.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domainInfoHelperModule.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="test.py">
