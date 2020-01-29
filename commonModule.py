@@ -13,9 +13,9 @@ import os
 import sys
 import urllib.request
 
-#从指定的配置文件读取配置
-def ReadConfig(configPath):
-    with open(configPath,'r', encoding='utf-8') as jsonFile:
+#从指定的配置文件读取配置，rwopt为读写选项
+def ReadConfig(configPath, rwopt):
+    with open(configPath, 'w', encoding='utf-8') as jsonFile:
         config = json.load(jsonFile)
     return config
 
@@ -32,7 +32,7 @@ def ExecuteGetResults(client,request):
 
 #从指定的配置文件构造client对象
 def GetAliyunClient(configPath):
-    UserConfig = ReadConfig(configPath)
+    UserConfig = ReadConfig(configPath, 'r')
     accessKeyId = UserConfig['accessKeyId']
     accessSecret = UserConfig['accessSecret']
     domainName = UserConfig['domainName']
@@ -48,23 +48,25 @@ def GetPublicIpAddress():
 
 '''
 获取所有云端记录的IP地址
-格式为[{'Remote_RR': ..., 'Remote_Value': ...}, {'Remote_RR': ..., 'Remote_Value': ...}]
+格式为[{'Remote_RecordId':..., 'Remote_RR': ..., 'Remote_Value': ..., 'Remote_Line':...}, {...}]
 '''
 def GetRemoteRecordsIpAddress():
     userConfigPath = "C:/Users/windr/Documents/userInfo.json"
-    UserConfig = ReadConfig(userConfigPath)
+    UserConfig = ReadConfig(userConfigPath, 'r')
     domainName = UserConfig['domainName']
     client = GetAliyunClient(userConfigPath)
     DescribeDomainRecords = DescribeDomainRecordsRequestHelper(client, domainName)
     DescribeDomainRecordsJson = json.loads(DescribeDomainRecords)
-    RemoteList_RRValue = []
+    RemoteList_RecordIdRRValue = []
     for i in range(len(DescribeDomainRecordsJson['DomainRecords']['Record'])):
+        Remote_RecordId = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['RecordId']
         Remote_RR = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['RR']
-        Remote_Value = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['Value']
-        RemoteDict_RRValue = {'Remote_RR':Remote_RR, 'Remote_Value':Remote_Value}
-        RemoteList_RRValue.append(RemoteDict_RRValue)
-    #print(RemoteList_RRValue)
-    return RemoteList_RRValue
+        Remote_Value = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['Value']  
+        Remote_Line = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['Line']     
+        RemoteDict_RRValue = {'Remote_RecordId':Remote_RecordId, 'Remote_RR':Remote_RR, 'Remote_Value':Remote_Value, 'Remote_Line':Remote_Line}
+        RemoteList_RecordIdRRValue.append(RemoteDict_RRValue)
+    print(RemoteList_RecordIdRRValue)
+    return RemoteList_RecordIdRRValue
 
 #获取指定域名的所有子域名信息
 #https://help.aliyun.com/document_detail/29776.html?spm=a2c4g.11186623.6.650.94a13b59Q6kBCd

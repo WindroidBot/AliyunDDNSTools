@@ -4,7 +4,7 @@ import sys
 from commonModule import *
 
 userConfigPath = "C:/Users/windr/Documents/userInfo.json"
-UserConfig = ReadConfig(userConfigPath)
+UserConfig = ReadConfig(userConfigPath, 'r')
 
 domainName = UserConfig['domainName']
 
