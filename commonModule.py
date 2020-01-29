@@ -15,8 +15,9 @@ import urllib.request
 
 #从指定的配置文件读取配置，rwopt为读写选项
 def ReadConfig(configPath, rwopt):
-    with open(configPath, 'w', encoding='utf-8') as jsonFile:
+    with open(configPath, rwopt, encoding='utf-8') as jsonFile:
         config = json.load(jsonFile)
+    jsonFile.close()
     return config
 
 '''
@@ -43,7 +44,12 @@ def GetAliyunClient(configPath):
 def GetPublicIpAddress():
     requestIpUrl="http://ip.42.pl/raw"
     response=urllib.request.urlopen(requestIpUrl).read()
-    responseIpAddress = str(response, encoding = "utf8")
+    try:
+        responseIpAddress = str(response, encoding = "utf8")
+    except:
+        print("获取公网地址失败")
+        exit()
+    print("获取的公网地址是："+responseIpAddress)
     return responseIpAddress
 
 '''
@@ -65,7 +71,7 @@ def GetRemoteRecordsIpAddress():
         Remote_Line = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['Line']     
         RemoteDict_RRValue = {'Remote_RecordId':Remote_RecordId, 'Remote_RR':Remote_RR, 'Remote_Value':Remote_Value, 'Remote_Line':Remote_Line}
         RemoteList_RecordIdRRValue.append(RemoteDict_RRValue)
-    print(RemoteList_RecordIdRRValue)
+    #print(RemoteList_RecordIdRRValue)
     return RemoteList_RecordIdRRValue
 
 #获取指定域名的所有子域名信息
@@ -94,7 +100,7 @@ def AddDomainRecordHelper(Client, DomainName, RR, Type, Value, Line):
     Request.set_Line(Line)
 
     result = ExecuteGetResults(Client,Request)
-    print(result)
+    #print(result)
     return result
 
 #根据RecordID删除记录
@@ -138,5 +144,5 @@ def UpdateDomainRecordHelper(Client, RecordId, RR, Type, Value, Line):
     Request.set_Line(Line)
 
     result = ExecuteGetResults(Client,Request)
-    print(result)
+    #print(result)
     return result
