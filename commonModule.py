@@ -12,12 +12,21 @@ import json
 import os
 import sys
 import urllib.request
+import logging
+from logging.config import fileConfig
+
+logging.config.fileConfig('log.conf')
+logger = logging.getLogger('Common')
 
 #从指定的配置文件读取配置，rwopt为读写选项
 def ReadConfig(configPath, rwopt):
-    with open(configPath, rwopt, encoding='utf-8') as jsonFile:
-        config = json.load(jsonFile)
-    jsonFile.close()
+    try:
+        with open(configPath, rwopt, encoding='utf-8') as jsonFile:
+            config = json.load(jsonFile)
+        jsonFile.close()
+    except:
+        logger.error("Loading JSON file failed: "+configPath)
+    logger.info("Load JSON file successfully: "+configPath)
     return config
 
 '''
@@ -26,9 +35,13 @@ def ReadConfig(configPath, rwopt):
 '''
 def ExecuteGetResults(client,request):
     response = client.do_action_with_exception(request)
-    responseStr = str(response, encoding = "utf8")
+    try:
+        responseStr = str(response, encoding = "utf8")
+    except:
+        logger.error("Execution failed")
     responseJson = json.loads(responseStr)
     responseDict=json.dumps(responseJson,indent=4)
+    logger.debug("Return message: "+responseStr)
     return responseDict
 
 #从指定的配置文件构造client对象
@@ -43,13 +56,13 @@ def GetAliyunClient(configPath):
 #获取当前公网地址
 def GetPublicIpAddress():
     requestIpUrl="http://ip.42.pl/raw"
-    response=urllib.request.urlopen(requestIpUrl).read()
     try:
+        response=urllib.request.urlopen(requestIpUrl).read()   
         responseIpAddress = str(response, encoding = "utf8")
     except:
-        print("获取公网地址失败")
+        logger.error("Failed to obtain public network address")
         exit()
-    print("获取的公网地址是："+responseIpAddress)
+    logger.info("Successfully obtained public network address: "+responseIpAddress)
     return responseIpAddress
 
 '''
@@ -71,7 +84,7 @@ def GetRemoteRecordsIpAddress():
         Remote_Line = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['Line']     
         RemoteDict_RRValue = {'Remote_RecordId':Remote_RecordId, 'Remote_RR':Remote_RR, 'Remote_Value':Remote_Value, 'Remote_Line':Remote_Line}
         RemoteList_RecordIdRRValue.append(RemoteDict_RRValue)
-    #print(RemoteList_RecordIdRRValue)
+    logger.debug("Obtained cloud DNS list: "+str(RemoteList_RecordIdRRValue))
     return RemoteList_RecordIdRRValue
 
 #获取指定域名的所有子域名信息

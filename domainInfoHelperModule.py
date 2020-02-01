@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from commonModule import *
+import logging
 
 domainConfigPath = "C:/Users/windr/Documents/domainInfo.json"
 userConfigPath = "C:/Users/windr/Documents/userInfo.json"
@@ -14,6 +15,9 @@ client = GetAliyunClient(userConfigPath)
 RemoteList_RecordIdRRValue = GetRemoteRecordsIpAddress()
 publicAddress = GetPublicIpAddress()
 
+logging.config.fileConfig('log.conf')
+logger = logging.getLogger('DomainInfoHelper')
+
 #UpdateAliyunDNSRecord
 def UpdateAliyunDNSRecord():
     for i in range(len(domainConfig['Record'])):
@@ -22,16 +26,19 @@ def UpdateAliyunDNSRecord():
         local_RecordId = domainConfig['Record'][i]['RecordId']
         local_Line = domainConfig['Record'][i]['Line']
 
-        print("---------------------------------------------------")
+        #logger.debug("------UpdateAliyunDNSRecord------")
         #local_RecordId为空，则添加记录
         if local_RecordId == "":
             #print("第"+i+"个数据RecordId为空")
+            logger.debug("The No."+ str(i) +" data RecordId is empty")
             try:            
                 AddDomainRecord = AddDomainRecordHelper(client, domainName, local_RR, local_Type, publicAddress, local_Line)
                 RecordId = json.loads(AddDomainRecord)['RecordId']
-                print("DNS记录添加成功："+RecordId+" | "+local_RR+"."+domainName+" | "+local_Type+" | "+publicAddress+" | "+local_Line)
+                #print("DNS记录添加成功："+RecordId+" | "+local_RR+"."+domainName+" | "+local_Type+" | "+publicAddress+" | "+local_Line)
+                logger.info("DNS record added successfully: "+RecordId+" | "+local_RR+"."+domainName+" | "+local_Type+" | "+publicAddress+" | "+local_Line)
             except:
-                print("DNS记录添加失败：", sys.exc_info()[0])
+                #print("DNS记录添加失败：", sys.exc_info()[0])
+                logger.error("DNS record addition failed")
             '''
             将修改过的新RecordId回写进userConfig中
             '''
@@ -43,24 +50,25 @@ def UpdateAliyunDNSRecord():
         elif isRecordExistAndNotEqual(local_RecordId, RemoteList_RecordIdRRValue):
             try:
                 UpdateDomainRecordHelper(client, local_RecordId, local_RR, local_Type, publicAddress, local_Line)
-                print("更新记录成功local_RecordId："+local_RecordId)
+                #print("更新记录成功local_RecordId："+local_RecordId)
+                logger.info("Update DNS record successfully")
             except:
-                print("更新记录失败local_RecordId："+local_RecordId, sys.exc_info()[0])
-    print("---------------------------------------------------")
-    print("动态DNS更新地址完成")
+                logger.error("Update DNS record failed,local_RecordId: "+local_RecordId, sys.exc_info()[0])
+    #logger.debug("------UpdateAliyunDNSRecord------")
+    logger.info("Dynamic DNS update address completed")
 
 #根据本地记录的RecordId在云端查找是否已存在该记录且是否不相等（此时需要修改）,False表示无需更改，True表示需要更新数据
 def isRecordExistAndNotEqual(LocalRecordIdStr, RemoteList):
     for i in range(len(RemoteList)):
         if LocalRecordIdStr == RemoteList[i]['Remote_RecordId']:
-            print("LocalRecordId："+LocalRecordIdStr+"存在")
+            #print("LocalRecordId："+LocalRecordIdStr+"存在")
+            logger.info("LocalRecordId: " + LocalRecordIdStr + " exists")
             if publicAddress == RemoteList[i]['Remote_Value']:
-                print("云端记录地址为"+publicAddress+"与本地相同，无需更改")
+                #print("云端记录地址为"+publicAddress+"与本地相同，无需更改")
+                logger.info("Cloud Record Address is: " + publicAddress + " is the same as the local one, no need to change")
                 return False
             else:
-                print("云端记录地址为"+RemoteList[i]['Remote_Value']+"与当前公网地址"+publicAddress+"不相同，需更改")
+                logger.info("Cloud Record Address is "+RemoteList[i]['Remote_Value']+" is different from the local public network address "+publicAddress+" and needs to be changed")
                 return True
-    print("LocalRecordId："+LocalRecordIdStr+"不存在")
+    logger.warning("LocalRecordId: "+LocalRecordIdStr+" does not exist")
     return False
-
-UpdateAliyunDNSRecord()
