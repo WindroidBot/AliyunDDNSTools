@@ -50,7 +50,12 @@ def GetAliyunClient(configPath):
     accessKeyId = UserConfig['accessKeyId']
     accessSecret = UserConfig['accessSecret']
     domainName = UserConfig['domainName']
-    client = AcsClient(accessKeyId, accessSecret, 'cn-hangzhou')
+    try:
+        client = AcsClient(accessKeyId, accessSecret, 'cn-hangzhou')
+        logger.info("Client created successfully")
+    except:
+        logger.error("Client creation failed")
+        quit()
     return client
 
 #获取当前公网地址
@@ -61,31 +66,9 @@ def GetPublicIpAddress():
         responseIpAddress = str(response, encoding = "utf8")
     except:
         logger.error("Failed to obtain public network address")
-        exit()
+        quit()
     logger.info("Successfully obtained public network address: "+responseIpAddress)
     return responseIpAddress
-
-'''
-获取所有云端记录的IP地址
-格式为[{'Remote_RecordId':..., 'Remote_RR': ..., 'Remote_Value': ..., 'Remote_Line':...}, {...}]
-'''
-def GetRemoteRecordsIpAddress():
-    userConfigPath = "C:/Users/windr/Documents/userInfo.json"
-    UserConfig = ReadConfig(userConfigPath, 'r')
-    domainName = UserConfig['domainName']
-    client = GetAliyunClient(userConfigPath)
-    DescribeDomainRecords = DescribeDomainRecordsRequestHelper(client, domainName)
-    DescribeDomainRecordsJson = json.loads(DescribeDomainRecords)
-    RemoteList_RecordIdRRValue = []
-    for i in range(len(DescribeDomainRecordsJson['DomainRecords']['Record'])):
-        Remote_RecordId = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['RecordId']
-        Remote_RR = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['RR']
-        Remote_Value = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['Value']  
-        Remote_Line = DescribeDomainRecordsJson['DomainRecords']['Record'][i]['Line']     
-        RemoteDict_RRValue = {'Remote_RecordId':Remote_RecordId, 'Remote_RR':Remote_RR, 'Remote_Value':Remote_Value, 'Remote_Line':Remote_Line}
-        RemoteList_RecordIdRRValue.append(RemoteDict_RRValue)
-    logger.debug("Obtained cloud DNS list: "+str(RemoteList_RecordIdRRValue))
-    return RemoteList_RecordIdRRValue
 
 #获取指定域名的所有子域名信息
 #https://help.aliyun.com/document_detail/29776.html?spm=a2c4g.11186623.6.650.94a13b59Q6kBCd
