@@ -6,6 +6,7 @@ AliyunDDNSTools
 2、Aliyun Python SDK Core https://pypi.org/project/aliyun-python-sdk-core-v3/<br>
 3、Aliyun Python SDK for AliDNS https://pypi.org/project/aliyun-python-sdk-alidns/<br>
 4、Aliyun Python SDK for Domain https://pypi.org/project/aliyun-python-sdk-domain-intl/<br>
+5、APScheduler https://pypi.org/project/APScheduler/<br>
 ## 运行方式<br>
 首先手动创建userconfigure.json，用于存储身份验证信息以及操作的主域名，格式如下：<br>
 ```json
