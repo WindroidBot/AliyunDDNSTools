@@ -66,7 +66,7 @@ def GetPublicIpAddress():
         responseIpAddress = str(response, encoding = "utf8")
     except:
         logger.error("Failed to obtain public network address")
-        quit()
+        return GetAliyunClient()
     logger.info("Successfully obtained public network address: "+responseIpAddress)
     return responseIpAddress
 

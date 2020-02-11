@@ -3,6 +3,7 @@ import os
 import sys
 from commonModule import *
 import logging
+from logging.config import fileConfig
 
 logging.config.fileConfig('log.conf')
 logger = logging.getLogger('DomainInfoHelper')
@@ -38,8 +39,13 @@ def GetRemoteRecordsIpAddress():
 
 #UpdateAliyunDNSRecord
 def UpdateAliyunDNSRecord():
+    domainConfigDirt = ReadConfig(domainConfigPath, 'r')
     RemoteList_RecordIdRRValue = GetRemoteRecordsIpAddress()
+    oldIP = domainConfigDirt['IPaddr']
     publicAddress = GetPublicIpAddress()
+    if oldIP != publicAddress:
+        
+    
 
     for i in range(len(domainConfig['Record'])):
         local_RR = domainConfig['Record'][i]['RR']
@@ -62,8 +68,7 @@ def UpdateAliyunDNSRecord():
                 logger.error("DNS record addition failed")
             '''
             将修改过的新RecordId回写进userConfig中
-            '''
-            domainConfigDirt = ReadConfig(domainConfigPath, 'r')
+            '''           
             domainConfigDirt['Record'][i]['RecordId'] = json.loads(AddDomainRecord)['RecordId']
             with open(domainConfigPath, 'w+') as domainConfig_newJson:
                 json.dump(domainConfigDirt, domainConfig_newJson ,indent=4)

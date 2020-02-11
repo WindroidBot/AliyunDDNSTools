@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>2d51080d-8f1a-43b5-91ee-cee329442520</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>main.py</StartupFile>
+    <StartupFile>mailHelperModule.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -26,6 +26,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="domainInfoHelperModule.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="mailHelperModule.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="main.py">
