@@ -65,7 +65,7 @@ def GetPublicIpAddress():
         response=urllib.request.urlopen(requestIpUrl).read()   
         responseIpAddress = str(response, encoding = "utf8")
     except:
-        logger.error("Failed to obtain public network address")
+        logger.error("Failed to obtain public network address, retrying...")
         return GetPublicIpAddress()
     logger.info("Successfully obtained public network address: "+responseIpAddress)
     return responseIpAddress
