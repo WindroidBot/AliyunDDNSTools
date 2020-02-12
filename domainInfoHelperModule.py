@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from commonModule import *
+from mailHelperModule import sendMessage
 import logging
 from logging.config import fileConfig
 
@@ -41,12 +42,18 @@ def GetRemoteRecordsIpAddress():
 def UpdateAliyunDNSRecord():
     domainConfigDirt = ReadConfig(domainConfigPath, 'r')
     RemoteList_RecordIdRRValue = GetRemoteRecordsIpAddress()
-    oldIP = domainConfigDirt['IPaddr']
+    
+    #获取旧地址，若与新地址不同，则发送通知邮件
     publicAddress = GetPublicIpAddress()
-    if oldIP != publicAddress:
+    oldIP = domainConfigDirt['IPaddr']
+    if oldIP !=publicAddress:
+        domainConfigDirt['IPaddr'] = publicAddress
+        messageStr = "Your public address has changed. The new address is: " + publicAddress + ",and the old address is: " + oldIP + ".This message was sent automatically by an unattended mailbox, please do not reply."
+        sendMessage(userConfigPath,messageStr)
+        with open(domainConfigPath, 'w+') as domainConfig_newJson:
+            json.dump(domainConfigDirt, domainConfig_newJson ,indent=4)
         
     
-
     for i in range(len(domainConfig['Record'])):
         local_RR = domainConfig['Record'][i]['RR']
         local_Type = domainConfig['Record'][i]['Type']

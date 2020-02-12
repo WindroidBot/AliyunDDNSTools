@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>2d51080d-8f1a-43b5-91ee-cee329442520</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>mailHelperModule.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
