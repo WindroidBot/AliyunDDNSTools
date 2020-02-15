@@ -23,8 +23,8 @@ AliyunDDNSTools
 		"sender": "sender E-Mail Address",
 		"receivers":[
 			"receivers1 E-Mail Address",
-      "receivers2 E-Mail Address",
-      "More E-Mail Address"
+      			"receivers2 E-Mail Address",
+      			"More E-Mail Address"
 		]
 	}
 }
